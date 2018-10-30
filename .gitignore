@@ -6,3 +6,8 @@
 
 # Python
 venv
+*.egg-info
+*.pyc
+
+# Vim
+*.swp
