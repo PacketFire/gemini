@@ -1,3 +1,4 @@
 pip-tools==2.0.2
 mypy==0.630
 mypy_extensions==0.4.1
+pre_commit==1.12.0
