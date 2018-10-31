@@ -9,5 +9,6 @@ first==2.0.1              # via pip-tools
 mypy-extensions==0.4.1
 mypy==0.630
 pip-tools==2.0.2
+pyyaml==3.13
 six==1.11.0               # via pip-tools
 typed-ast==1.1.0          # via mypy
