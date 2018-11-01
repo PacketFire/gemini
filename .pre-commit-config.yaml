@@ -1,0 +1,28 @@
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.0.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-docstring-first
+    -   id: check-yaml
+    -   id: debug-statements
+    -   id: name-tests-test
+    -   id: flake8
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v0.641
+    hooks:
+    -   id: mypy
+        args: [--ignore-missing-imports]
+-   repo: https://github.com/asottile/reorder_python_imports
+    rev: v1.3.0
+    hooks:
+    -   id: reorder-python-imports
+        language_version: python2.7
+-   repo: https://github.com/asottile/add-trailing-comma
+    rev: v0.7.1
+    hooks:
+    -   id: add-trailing-comma
+-   repo: meta
+    hooks:
+    -   id: check-hooks-apply
+    -   id: check-useless-excludes
