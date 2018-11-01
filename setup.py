@@ -16,5 +16,7 @@ setup(
     keywords="gemini scheduler container",
     packages=["gemini"],
 
-    install_requires=[]
+    install_requires=[
+        'PyYAML>=3.13'
+    ]
 )
