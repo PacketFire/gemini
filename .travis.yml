@@ -11,10 +11,9 @@ matrix:
 
 # commands to install dependencies
 install:
-  - python3 -m venv venv
   - make pip-install
   - make install-pre-commit
 
 # command to run tests
 script:
-  - make type
+  - mypy --ignore-missing-imports .
