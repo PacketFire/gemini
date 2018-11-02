@@ -11,8 +11,7 @@ matrix:
 
 # commands to install dependencies
 install:
-  - make pip-install
-  - make install-pre-commit
+  - pip install -r requirements.txt
 
 # command to run tests
 script:
