@@ -9,7 +9,7 @@ cached-property==1.5.1    # via pre-commit
 certifi==2018.10.15       # via requests
 cfgv==1.1.0               # via pre-commit
 chardet==3.0.4            # via requests
-click==7.0                # via flask, pip-tools
+click==7.0
 first==2.0.1              # via pip-tools
 flask==1.0.2
 identify==1.1.7           # via pre-commit
