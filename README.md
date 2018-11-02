@@ -1,5 +1,6 @@
 # gemini 
 [![Build Status](https://travis-ci.org/PacketFire/gemini.svg?branch=master)](https://travis-ci.org/PacketFire/gemini)
+A simple container scheduler
 
 ## Installation
 * Clone this project
@@ -19,7 +20,8 @@ make pip-install
 make install-pre-commit
 ```
 
-* Run the command below
-```shell
-  $ pip install --editable .
+## Running
+* Run the webserver as
+```bash
+python gemini master
 ```
