@@ -10,6 +10,7 @@ def home() -> str:
     return "Home"
 
 @app.route('/_info')
+def info() -> str:
     response = {
         "statusCode": 200,
         "body": json.dumps(metadata.version())
