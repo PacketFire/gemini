@@ -1,7 +1,6 @@
 from flask import Flask
-import json
+import metadata
 
-VERSION = "0.1"
 app = Flask('gemini-master')
 
 
@@ -10,17 +9,7 @@ def home() -> str:
     return "Home"
 
 @app.route('/_info')
-def info() -> str:
-    body = {
-        "version":  VERSION 
-    }
-
-    response = {
-        "statusCode": 200,
-        "body": json.dumps(body)
-    }
-
-    return response
+    metadata.info()
 
 def start_master_server() -> None:
     app.run(debug=True)
