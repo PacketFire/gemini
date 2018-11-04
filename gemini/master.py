@@ -10,12 +10,11 @@ def home() -> str:
     return "Home"
 
 @app.route('/_info')
-def info() -> object:
+def info() -> str:
     response = {
-        "statusCode": 200,
-        "body": json.dumps(metadata.version())
+        "version": json.dumps(metadata.version())
     }
-    return response
+    return str(response)
 
 def start_master_server() -> None:
     app.run(debug=True)
