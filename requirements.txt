@@ -10,6 +10,8 @@ certifi==2018.10.15       # via requests
 cfgv==1.1.0               # via pre-commit
 chardet==3.0.4            # via requests
 click==7.0
+docker-pycreds==0.3.0     # via docker
+docker==3.5.1
 first==2.0.1              # via pip-tools
 flask==1.0.2
 identify==1.1.7           # via pre-commit
@@ -26,9 +28,10 @@ pre_commit==1.12.0
 python-consul==1.1.0
 pyyaml==3.13
 requests==2.20.0
-six==1.11.0               # via cfgv, pip-tools, pre-commit, python-consul
+six==1.11.0               # via cfgv, docker, docker-pycreds, pip-tools, pre-commit, python-consul, websocket-client
 toml==0.10.0              # via pre-commit
 typed-ast==1.1.0          # via mypy
 urllib3==1.24             # via requests
 virtualenv==16.1.0        # via pre-commit
+websocket-client==0.54.0  # via docker
 werkzeug==0.14.1          # via flask

@@ -1,4 +1,5 @@
 click==7.0
+docker==3.5.1
 flask==1.0.2
 mypy==0.630
 mypy_extensions==0.4.1
