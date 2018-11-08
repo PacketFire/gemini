@@ -1,5 +1,6 @@
 import click
-from master import start_master_server
+from master import start_master
+from node import start_node
 
 
 @click.group()
@@ -17,13 +18,14 @@ def version() -> None:
 def master() -> None:
     """Runs the master daemon"""
     click.echo("Hello from master")
-    start_master_server()
+    start_master()
 
 
 @click.command()
 def node() -> None:
     """Runs the node daemon"""
     click.echo("Hello from node")
+    start_node()
 
 
 if __name__ == "__main__":
