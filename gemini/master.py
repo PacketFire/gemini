@@ -38,7 +38,7 @@ def register() -> str:
     node_id = secrets.token_hex(4)
     token = secrets.token_hex(NODE_TOKEN_BYTES)
 
-    c.kv.put(f'nodes/tokens/{token}', node_id)
+    c.kv.put('nodes/tokens/' + token, node_id)
 
     response = {
         "token": token,
