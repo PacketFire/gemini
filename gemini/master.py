@@ -1,10 +1,13 @@
+import json
 import secrets
 
 import consul
 import metadata
 from flask import Flask
 from flask import jsonify
+from flask import request
 
+NODE_ID_BYTES = 8
 NODE_TOKEN_BYTES = 32
 
 app = Flask('gemini-master')
@@ -13,35 +16,56 @@ c = consul.Consul(host='127.0.0.1', port=8500)
 
 
 @app.route('/')
-def home() -> str:
-    return "Home"
+def index() -> str:
+    return 'index'
 
 
 @app.route('/_info')
 def info() -> str:
     response = {
-        "version": metadata.version(),
+        'version': metadata.version(),
     }
-    return jsonify(response)
-
-
-@app.route('/v1/nodes', methods=['GET'])
-def get_nodes() -> str:
-    tokens = c.kv.get('nodes/tokens/', keys=True)
-    response = tokens[1]
 
     return jsonify(response)
 
 
-@app.route('/v1/nodes', methods=['POST'])
-def register() -> str:
-    node_id = secrets.token_hex(4)
+@app.route('/v1/nodes/join', methods=['POST'])
+def join() -> str:
+    node_id = secrets.token_hex(NODE_ID_BYTES)
     token = secrets.token_hex(NODE_TOKEN_BYTES)
 
+    value = {
+        'node_id': node_id,
+        'expires': 5000,
+    }
+
+    c.kv.put('nodes/' + node_id, json.dumps(value))
     c.kv.put('nodes/tokens/' + token, node_id)
 
     response = {
-        "token": token,
+        'node_id': node_id,
+        'token': token,
+        'expires': 5000,
+    }
+
+    return jsonify(response)
+
+
+@app.route('/v1/nodes/ping', methods=['POST'])
+def ping() -> str:
+    token = request.headers.get('Authorization')
+
+    return token
+
+
+@app.route('/v1/nodes/refresh', methods=['POST'])
+def refresh() -> str:
+    token = request.headers.get('Authorization')
+    new_token = secrets.token_hex(NODE_TOKEN_BYTES)
+
+    response = {
+        'old_token': token,
+        'new_token': new_token,
     }
 
     return jsonify(response)
