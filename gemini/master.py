@@ -31,8 +31,8 @@ def info() -> str:
 
 @app.route('/v1/nodes/join', methods=['POST'])
 def join() -> str:
-    node_id = secrets.token_hex(NODE_ID_BYTES)
-    token = secrets.token_hex(NODE_TOKEN_BYTES)
+    node_id = generate_node_id()
+    token = generate_node_token()
 
     value = {
         'node_id': node_id,
@@ -61,7 +61,7 @@ def ping() -> str:
 @app.route('/v1/nodes/refresh', methods=['POST'])
 def refresh() -> str:
     token = request.headers.get('Authorization')
-    new_token = secrets.token_hex(NODE_TOKEN_BYTES)
+    new_token = generate_node_token()
 
     response = {
         'old_token': token,
@@ -69,6 +69,14 @@ def refresh() -> str:
     }
 
     return jsonify(response)
+
+
+def generate_node_id() -> str:
+    return secrets.token_hex(NODE_ID_BYTES)
+
+
+def generate_node_token() -> str:
+    return secrets.token_hex(NODE_TOKEN_BYTES)
 
 
 def start_master() -> None:
