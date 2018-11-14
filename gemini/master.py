@@ -1,20 +1,83 @@
-from flask import Flask
 import json
+import secrets
+
+import consul
 import metadata
+from flask import Flask
+from flask import jsonify
+from flask import request
+
+NODE_ID_BYTES = 8
+NODE_TOKEN_BYTES = 32
 
 app = Flask('gemini-master')
 
+c = consul.Consul(host='127.0.0.1', port=8500)
+
 
 @app.route('/')
-def home() -> str:
-    return "Home"
+def index() -> str:
+    return 'index'
+
 
 @app.route('/_info')
 def info() -> str:
     response = {
-        "version": json.dumps(metadata.version())
+        'version': metadata.version(),
     }
-    return str(response)
 
-def start_master_server() -> None:
+    return jsonify(response)
+
+
+@app.route('/v1/nodes/join', methods=['POST'])
+def join() -> str:
+    node_id = generate_node_id()
+    token = generate_node_token()
+
+    value = {
+        'node_id': node_id,
+        'expires': 5000,
+    }
+
+    c.kv.put('nodes/' + node_id, json.dumps(value))
+    c.kv.put('nodes/tokens/' + token, node_id)
+
+    response = {
+        'node_id': node_id,
+        'token': token,
+        'expires': 5000,
+    }
+
+    return jsonify(response)
+
+
+@app.route('/v1/nodes/ping', methods=['POST'])
+def ping() -> str:
+    token = request.headers.get('Authorization')
+
+    return token
+
+
+@app.route('/v1/nodes/refresh', methods=['POST'])
+def refresh() -> str:
+    token = request.headers.get('Authorization')
+    new_token = generate_node_token()
+
+    response = {
+        'old_token': token,
+        'new_token': new_token,
+    }
+
+    return jsonify(response)
+
+
+def generate_node_id() -> str:
+    return secrets.token_hex(NODE_ID_BYTES)
+
+
+def generate_node_token() -> str:
+    return secrets.token_hex(NODE_TOKEN_BYTES)
+
+
+def start_master() -> None:
     app.run(debug=True)
