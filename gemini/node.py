@@ -13,6 +13,9 @@ def start_node() -> None:
         loop.close()
 
 async def ping_process() -> None:
+    url = 'http://localhost:5000/v1/nodes/ping'
+    headers = {'Authorization': 'dummy'}
+
     while True:
         await asyncio.sleep(30)
-        r = requests.post("http://localhost:5000/v1/nodes/ping")
+        r = requests.post(url, headers=headers)
