@@ -1,16 +1,18 @@
-import sched, time, requests
+import asyncio, time, requests
 
 def start_node() -> None:
     print('starting node')
-    sched_handler()
 
-def ping_master() -> int:
-    r = requests.post("http://localhost:5000/v1/nodes/ping")
+    loop = asyncio.get_event_loop()
+    try:
+        asyncio.ensure_future(ping_process())
+        loop.run_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        loop.close()
 
-    return r.status_code
-
-def sched_handler() -> None:
-    s = sched.scheduler(time.time, time.sleep)
-
-    s.enter(30, 1, ping_master)
-    s.run()
+async def ping_process() -> None:
+    while True:
+        await asyncio.sleep(30)
+        r = requests.post("http://localhost:5000/v1/nodes/ping")
