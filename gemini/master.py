@@ -38,7 +38,7 @@ def join() -> str:
 
     value = {
         'node_id': node_id,
-        'password': password,
+        'password': hashed,
     }
 
     c.kv.put('nodes/' + node_id, json.dumps(value))
