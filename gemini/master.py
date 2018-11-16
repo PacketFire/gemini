@@ -1,6 +1,6 @@
 import json
 import secrets
-
+import bcrypt
 import consul
 import metadata
 from flask import Flask
@@ -9,6 +9,7 @@ from flask import request
 
 NODE_ID_BYTES = 8
 NODE_TOKEN_BYTES = 32
+NODE_PASSWORD_BYTES = 32
 
 app = Flask('gemini-master')
 
@@ -32,24 +33,22 @@ def info() -> str:
 @app.route('/v1/nodes/join', methods=['POST'])
 def join() -> str:
     node_id = generate_node_id()
-    token = generate_node_token()
+    password = generate_node_password()
+    hashed = bcrypt.hashpw(password, bcrypt.gensalt())
 
     value = {
         'node_id': node_id,
-        'expires': 5000,
+        'password': hashed,
     }
 
     c.kv.put('nodes/' + node_id, json.dumps(value))
-    c.kv.put('nodes/tokens/' + token, node_id)
 
     response = {
         'node_id': node_id,
-        'token': token,
-        'expires': 5000,
+        'password': password,
     }
 
     return jsonify(response)
-
 
 @app.route('/v1/nodes/ping', methods=['POST'])
 def ping() -> str:
@@ -78,6 +77,8 @@ def generate_node_id() -> str:
 def generate_node_token() -> str:
     return secrets.token_hex(NODE_TOKEN_BYTES)
 
+def generate_node_password() -> str:
+    return secrets.token_hex(NODE_PASSWORD_BYTES)
 
 def start_master() -> None:
     app.run(debug=True)
