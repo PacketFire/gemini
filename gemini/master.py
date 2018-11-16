@@ -1,5 +1,5 @@
 import json
-import secrets, string
+import secrets
 
 import consul
 import metadata
