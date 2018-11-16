@@ -1,6 +1,6 @@
 import json
 import secrets
-
+import bcrypt
 import consul
 import metadata
 from flask import Flask
@@ -34,21 +34,18 @@ def info() -> str:
 def join() -> str:
     node_id = generate_node_id()
     password = generate_node_password()
+    hashed = bcrypt.hashpw(password, bcrypt.gensalt())
 
     value = {
         'node_id': node_id,
-        'expires': 5000,
+        'password': password,
     }
 
     c.kv.put('nodes/' + node_id, json.dumps(value))
-    c.kv.put('nodes/' + password, node_id)
-
-
 
     response = {
         'node_id': node_id,
         'password': password,
-        'expires': 5000,
     }
 
     return jsonify(response)
@@ -82,7 +79,6 @@ def generate_node_token() -> str:
 
 def generate_node_password() -> str:
     return secrets.token_hex(NODE_PASSWORD_BYTES)
-
 
 def start_master() -> None:
     app.run(debug=True)
