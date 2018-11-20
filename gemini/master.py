@@ -50,6 +50,20 @@ def join() -> str:
 
     return jsonify(response)
 
+@app.route('/v1/nodes/auth', methods=['POST'])
+def auth() -> None:
+    data = request.get_json()
+    cdata = c.kv.get('nodes/' + data.node_id)
+
+    if bcrypt.checkpw(data.password, cdata['password']):
+        # for now not doing anything with token but printing it
+        token = generate_node_token()
+        print(token)
+        
+    else:
+        print('Password does not match!')
+
+
 @app.route('/v1/nodes/ping', methods=['POST'])
 def ping() -> str:
     token = request.headers.get('Authorization')
