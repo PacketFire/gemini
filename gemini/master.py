@@ -34,11 +34,11 @@ def info() -> str:
 def join() -> str:
     node_id = generate_node_id()
     password = generate_node_password()
-    hashed = bcrypt.hashpw(password, bcrypt.gensalt())
+    hashed = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt())
 
     value = {
         'node_id': node_id,
-        'password': hashed,
+        'password': hashed.decode('utf8'),
     }
 
     c.kv.put('nodes/' + node_id, json.dumps(value))
@@ -50,18 +50,22 @@ def join() -> str:
 
     return jsonify(response)
 
-@app.route('/v1/nodes/auth', methods=['POST'])
-def auth() -> None:
-    data = request.get_json()
-    cdata = c.kv.get('nodes/' + data.node_id)
+@app.route('/v1/nodes/auth', methods=['GET', 'POST'])
+def auth() -> str:
+    node_id = request.args.get('node_id')
+    password = request.get_json('password')
 
-    if bcrypt.checkpw(data.password, cdata['password']):
-        # for now not doing anything with token but printing it
+    cdata = c.kv.get('nodes/' + node_id)
+    cvalues = json.loads(cdata[1]['Value'])
+
+    if bcrypt.checkpw(password['password'].encode('utf8'), cvalues['password'].encode('utf8')):
         token = generate_node_token()
-        print(token)
-        
+        response = {
+            'token': token,
+        }
+        return jsonify(response)
     else:
-        print('Password does not match!')
+        return "Passwords do not match\n"
 
 
 @app.route('/v1/nodes/ping', methods=['POST'])
