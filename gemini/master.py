@@ -50,15 +50,14 @@ def join() -> str:
 
     return jsonify(response)
 
-@app.route('/v1/nodes/auth', methods=['GET', 'POST'])
-def auth() -> str:
-    node_id = request.args.get('node_id')
-    password = request.get_json('password')
 
-    cdata = c.kv.get('nodes/' + node_id)
+@app.route('/v1/nodes/auth', methods=['POST'])
+def auth() -> str:
+    data = request.get_json()
+    cdata = c.kv.get('nodes/' + data['node_id'])
     cvalues = json.loads(cdata[1]['Value'])
 
-    if bcrypt.checkpw(password['password'].encode('utf8'), cvalues['password'].encode('utf8')):
+    if bcrypt.checkpw(data['password'].encode('utf8'), cvalues['password'].encode('utf8')):
         token = generate_node_token()
         response = {
             'token': token,
@@ -87,10 +86,8 @@ def refresh() -> str:
 
     return jsonify(response)
 
-
 def generate_node_id() -> str:
     return secrets.token_hex(NODE_ID_BYTES)
-
 
 def generate_node_token() -> str:
     return secrets.token_hex(NODE_TOKEN_BYTES)
