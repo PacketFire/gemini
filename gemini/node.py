@@ -25,7 +25,9 @@ async def ping_process() -> None:
 def join_master() -> None:
     print('joining master')
     url = 'http://localhost:5000/v1/nodes/join'
-    headers = {'Content-type': 'application/json'}
+    headers = {'Content-Type': 'application/json'}
     r = requests.post(url, headers)
 
-    print(r.json())
+    response = r.json()
+
+    print(response['node_id'] + "\n" + response['password'])
