@@ -1,6 +1,6 @@
 import asyncio, time, requests, json
 
-class Nodefiles:
+class Nodefile:
     def __init__(self, filename):
         self.filename = filename
     
@@ -8,7 +8,7 @@ class Nodefiles:
         try:
             self.fh = open("data/" + self.filename, "r")
         except IOError:
-            print("file does not exist")
+            print("file does not exist for node")
 
     def writer(self, data):
         try:
@@ -17,6 +17,13 @@ class Nodefiles:
         except IOError:
             with open("data/" + self.filename, "w") as self.fh:
                 self.fh.write(json.dumps(data))
+
+    def exists(self) -> bool:
+        try:
+            self.fh = open("data/" + self.filename, "r")
+            return True
+        except IOError:
+            return False
 
 
 def start_node() -> None:
@@ -69,15 +76,15 @@ def auth_node(node_id, password) -> None:
 
     try:
         response = r.json()
-        
-        nf = Nodefiles(node_id)
+
+        nf = Nodefile('node.json')
         filedata = {
             'node_id': node_id,
             'password': password,
-            'token': response['token'],
         }
         nf.writer(filedata)
 
         print(response['token'])
     except ValueError:
         print("no token returned, credentials do not validate.")
+
