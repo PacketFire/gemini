@@ -31,3 +31,27 @@ def join_master() -> None:
     response = r.json()
 
     print(response['node_id'] + "\n" + response['password'])
+
+    auth_node(response['node_id'], response['password'])
+
+
+def auth_node(node_id, password) -> None:
+    print('authenticating node')
+    
+    url = 'http://localhost:5000/v1/nodes/auth'
+    headers = {'Content-Type': 'application/json'}
+
+    auth = {
+        'node_id': node_id,
+        'password': password,
+    }
+
+    r = requests.post(url, headers=headers, json=auth)
+
+    try:
+        response = r.json()
+        print(response['token'])
+    except ValueError:
+        print("no token returned, credentials do not validate.")
+    
+    
