@@ -47,8 +47,11 @@ def auth_node(node_id, password) -> None:
     }
 
     r = requests.post(url, headers=headers, json=auth)
-    token = r.json()
 
-    print("node authenticated, token returned: " + token['token'])
-
+    try:
+        response = r.json()
+        print(response['token'])
+    except ValueError:
+        print("no token returned, credentials do not validate.")
+    
     
