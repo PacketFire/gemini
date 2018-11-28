@@ -1,4 +1,4 @@
-import asyncio, time, requests, json
+import asyncio, time, requests
 
 def start_node() -> None:
     print('starting node')
@@ -47,7 +47,7 @@ def auth_node(node_id, password) -> None:
     }
 
     r = requests.post(url, headers=headers, json=auth)
-    token = json.loads(r.text)
+    token = r.json()
 
     print("node authenticated, token returned: " + token['token'])
 
