@@ -22,10 +22,10 @@ async def ping_process() -> None:
         await asyncio.sleep(30)
         r = requests.post(url, headers=headers)
 
-def join_master() -> str:
+def join_master() -> None:
     print('joining master')
     url = 'http://localhost:5000/v1/nodes/join'
     headers = {'Content-type': 'application/json'}
     r = requests.post(url, headers)
 
-    return print(r.json())
+    print(r.json())
