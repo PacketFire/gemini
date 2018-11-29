@@ -83,7 +83,8 @@ def read_node_file() -> Nodedata:
             data = json.load(fh)
             return Nodedata(data['node_id'], data['password'])
     except IOError:
-        return Nodedata
+        # for now return blank data on error
+        return Nodedata('', '')
 
 
 def write_node_file(data: Nodedata):
