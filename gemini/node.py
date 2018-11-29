@@ -1,4 +1,22 @@
-import asyncio, time, requests
+import asyncio, time, requests, json
+
+class Nodedata:
+    def __init__(self, node_id, password):
+        self.node_id = node_id
+        self.password = password
+
+    def get_node_id(self) -> str:
+        return self.node_id
+
+    def set_node_id(self, newid):
+        self.node_id = newid
+
+    def get_node_password(self) -> str:
+        return self.password
+
+    def set_node_password(self, newpass):
+        self.password = newpass
+
 
 def start_node() -> None:
     print('starting node')
@@ -50,8 +68,42 @@ def auth_node(node_id, password) -> None:
 
     try:
         response = r.json()
+        nd = Nodedata(node_id, password)
+
+        write_node_file(nd)
+
         print(response['token'])
     except ValueError:
-        print("no token returned, credentials do not validate.")
-    
-    
+        print('no token returned, credentials do not validate.')
+
+
+def read_node_file() -> Nodedata:
+    try:
+        with open('data/node.json', 'r') as fh:
+            data = json.load(fh)
+            return Nodedata(data['node_id'], data['password'])
+    except IOError:
+        # for now return blank data on error
+        return Nodedata('', '')
+
+
+def write_node_file(data: Nodedata):
+    filedata = {
+        'node_id': data.get_node_id(),
+        'password': data.get_node_password(),
+    }
+    try:
+        with open('data/node.json', 'r') as fh:
+            fh.write(json.dumps(filedata))
+    except IOError:
+        with open('data/node.json', 'w') as fh:
+            fh.write(json.dumps(filedata))
+
+
+def node_file_exists() -> bool:
+    try:
+        fh = open('data/node.json', 'r')
+        fh.close()
+        return True
+    except IOError:
+        return False
