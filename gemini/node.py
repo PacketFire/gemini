@@ -20,7 +20,12 @@ class Nodedata:
 
 def start_node() -> None:
     print('starting node')
-    join_master()
+
+    if node_file_exists():
+        data = read_node_file()
+        auth_node(data.get_node_id(), data.get_node_password())
+    else:
+        join_master()
 
     loop = asyncio.get_event_loop()
     try:
