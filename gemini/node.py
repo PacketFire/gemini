@@ -77,7 +77,7 @@ def auth_node(node_id, password) -> None:
         print('no token returned, credentials do not validate.')
 
 
-def read_node_file() -> object:
+def read_node_file() -> Nodedata:
     try:
         with open('data/node.json', 'r') as fh:
             data = json.load(fh)
