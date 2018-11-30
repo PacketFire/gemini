@@ -26,6 +26,8 @@ def start_node() -> None:
         auth_node(data.get_node_id(), data.get_node_password())
     else:
         join_master()
+        data = read_node_file()
+        auth_node(data.get_node_id(), data.get_node_password())
 
     loop = asyncio.get_event_loop()
     try:
@@ -50,12 +52,13 @@ def join_master() -> None:
     url = 'http://localhost:5000/v1/nodes/join'
     headers = {'Content-Type': 'application/json'}
     r = requests.post(url, headers)
-
-    response = r.json()
-
-    print(response['node_id'] + "\n" + response['password'])
-
-    auth_node(response['node_id'], response['password'])
+    
+    try:
+        response = r.json()
+        nd = Nodedata(response['node_id'], response['password'])
+        write_node_file(nd)
+    except ValueError:
+        print('unable to write node data to node file')
 
 
 def auth_node(node_id, password) -> None:
@@ -73,10 +76,6 @@ def auth_node(node_id, password) -> None:
 
     try:
         response = r.json()
-        nd = Nodedata(node_id, password)
-
-        write_node_file(nd)
-
         print(response['token'])
     except ValueError:
         print('no token returned, credentials do not validate.')
