@@ -3,6 +3,7 @@ import json
 from typing import NamedTuple
 from typing import Optional
 
+import docker
 import requests
 
 
@@ -119,8 +120,15 @@ def authenticate(node_id, password) -> bool:
         finally:
             loop.close()
 
+        run_docker_container()
+
         return True
     except ValueError:
         print('Invalid node credentials.')
 
         return False
+
+
+def run_docker_container():
+    client = docker.from_env()
+    client.containers.run("busybox", "echo hello world")
