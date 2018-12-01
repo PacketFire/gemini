@@ -60,15 +60,6 @@ def start_node() -> None:
         else:
             authenticate(new_node_data.node_id, new_node_data.password)
 
-    loop = asyncio.get_event_loop()
-    try:
-        asyncio.ensure_future(ping())
-        loop.run_forever()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        loop.close()
-
 
 async def ping() -> None:
     url = 'http://localhost:5000/v1/nodes/ping'
@@ -118,6 +109,15 @@ def authenticate(node_id, password) -> bool:
         body = response.json()
 
         print('Successfully authenticated with master: ' + body['token'])
+
+        loop = asyncio.get_event_loop()
+        try:
+            asyncio.ensure_future(ping())
+            loop.run_forever()
+        except KeyboardInterrupt:
+            pass
+        finally:
+            loop.close()
 
         return True
     except ValueError:
