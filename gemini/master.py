@@ -57,7 +57,11 @@ def join() -> str:
 def auth() -> str:
     body = request.get_json()
     node_entry = c.kv.get('nodes/' + body['node_id'])
-    node_data = json.loads(node_entry[1]['Value'])
+
+    if all(node_entry):
+        node_data = json.loads(node_entry[1]['Value'])
+    else:
+        return "Value does not exist\n"
 
     if bcrypt.checkpw(
         body['password'].encode('utf8'),
