@@ -1,10 +1,16 @@
 import asyncio
 import json
+from typing import Any
+from typing import List
 from typing import NamedTuple
 from typing import Optional
+from typing import Type
 
 import docker
 import requests
+
+
+jobs = Type[List[Any]]  # type: Type[List[Any]]
 
 
 class NodeData(NamedTuple):
@@ -52,7 +58,8 @@ def start_node() -> None:
 
         node_data = read_node_file()
         if authenticate(node_data.node_id, node_data.password) is True:
-            run_docker_container()
+            get_jobs()
+            run_jobs()
             ping_loop()
     else:
         print('Node data not found.')
@@ -62,7 +69,8 @@ def start_node() -> None:
             pass
         else:
             if authenticate(new_data.node_id, new_data.password,) is True:
-                run_docker_container()
+                get_jobs()
+                run_jobs()
                 ping_loop()
 
 
@@ -131,6 +139,22 @@ def ping_loop():
         loop.close()
 
 
-def run_docker_container():
+def run_docker_container(image, command):
     client = docker.from_env()
-    client.containers.run("busybox", "echo hello world")
+    client.containers.run(image, command)
+
+
+def get_jobs():
+    global jobs
+
+    url = 'http://localhost:5000/v1/jobs'
+    headers = {'Content-Type': 'application/json'}
+
+    response = requests.get(url, headers=headers)
+    jobs = response.json()
+    print(jobs)
+
+
+def run_jobs():
+    for i in range(len(jobs)):
+        run_docker_container(jobs[i]['image'], jobs[i]['command'])
