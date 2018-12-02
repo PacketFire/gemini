@@ -17,6 +17,8 @@ app = Flask('gemini-master')
 
 c = consul.Consul(host='127.0.0.1', port=8500)
 
+jobs = []
+
 
 @app.route('/')
 def index() -> str:
@@ -74,6 +76,24 @@ def auth() -> str:
         return jsonify(response)
     else:
         return "Passwords do not match\n"
+
+
+@app.route('/v1/jobs', methods=['POST'])
+def create_job() -> str:
+    body = request.get_json()
+
+    global jobs
+    jobs.append({
+        'image': body['image'],
+        'command': body['command'],
+    })
+
+    return jsonify(body)
+
+
+@app.route('/v1/jobs', methods=['GET'])
+def get_jobs() -> str:
+    return jsonify(jobs)
 
 
 @app.route('/v1/nodes/ping', methods=['POST'])
