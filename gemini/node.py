@@ -52,15 +52,17 @@ def start_node() -> None:
 
         node_data = read_node_file()
         if authenticate(node_data.node_id, node_data.password) is True:
+            run_docker_container()
             ping_loop()
     else:
         print('Node data not found.')
 
-        new_node_data = join()
-        if new_node_data is None:
+        new_data = join()
+        if new_data is None:
             pass
         else:
-            if authenticate(node_data.node_id, node_data.password) is True:
+            if authenticate(new_data.node_id, new_data.password,) is True:
+                run_docker_container()
                 ping_loop()
 
 
@@ -111,7 +113,6 @@ def authenticate(node_id, password) -> bool:
     try:
         body = response.json()
         print('Successfully authenticated with master: ' + body['token'])
-        run_docker_container()
         return True
     except ValueError:
         print('Invalid node credentials.')
