@@ -79,7 +79,7 @@ def auth() -> str:
 
 
 @app.route('/v1/jobs', methods=['POST'])
-def jobs_post() -> str:
+def create_job() -> str:
     body = request.get_json()
 
     global jobs
@@ -92,7 +92,7 @@ def jobs_post() -> str:
 
 
 @app.route('/v1/jobs', methods=['GET'])
-def jobs_get() -> str:
+def get_jobs() -> str:
     return jsonify(jobs)
 
 
