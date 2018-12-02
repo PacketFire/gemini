@@ -9,9 +9,6 @@ import docker
 import requests
 
 
-jobs: List[Any]
-
-
 class NodeData(NamedTuple):
     node_id: str
     password: str
@@ -57,8 +54,8 @@ def start_node() -> None:
 
         node_data = read_node_file()
         if authenticate(node_data.node_id, node_data.password) is True:
-            get_jobs()
-            run_jobs()
+            jobs = get_jobs()  # type: List[Any]
+            run_jobs(jobs)
             ping_loop()
     else:
         print('Node data not found.')
@@ -68,8 +65,8 @@ def start_node() -> None:
             pass
         else:
             if authenticate(new_data.node_id, new_data.password,) is True:
-                get_jobs()
-                run_jobs()
+                jobs = get_jobs()
+                run_jobs(jobs)
                 ping_loop()
 
 
@@ -143,17 +140,17 @@ def run_docker_container(image, command):
     client.containers.run(image, command)
 
 
-def get_jobs():
-    global jobs
-
+def get_jobs() -> List[Any]:
     url = 'http://localhost:5000/v1/jobs'
     headers = {'Content-Type': 'application/json'}
 
     response = requests.get(url, headers=headers)
     jobs = response.json()
-    print(jobs)
+
+    return jobs
 
 
-def run_jobs():
+def run_jobs(jobs):
     for i in range(len(jobs)):
+        print('Running: %s and %s' % (jobs[i]['image'], jobs[i]['command']))
         run_docker_container(jobs[i]['image'], jobs[i]['command'])
