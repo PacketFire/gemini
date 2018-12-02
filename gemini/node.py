@@ -52,6 +52,7 @@ def start_node() -> None:
 
         node_data = read_node_file()
         authenticate(node_data.node_id, node_data.password)
+        ping_loop()
     else:
         print('Node data not found.')
 
@@ -60,6 +61,7 @@ def start_node() -> None:
             pass
         else:
             authenticate(new_node_data.node_id, new_node_data.password)
+            ping_loop()
 
 
 async def ping() -> None:
@@ -108,25 +110,24 @@ def authenticate(node_id, password) -> bool:
 
     try:
         body = response.json()
-
         print('Successfully authenticated with master: ' + body['token'])
-
-        loop = asyncio.get_event_loop()
-        try:
-            asyncio.ensure_future(ping())
-            loop.run_forever()
-        except KeyboardInterrupt:
-            pass
-        finally:
-            loop.close()
-
         run_docker_container()
-
         return True
     except ValueError:
         print('Invalid node credentials.')
 
         return False
+
+
+def ping_loop():
+    loop = asyncio.get_event_loop()
+    try:
+        asyncio.ensure_future(ping())
+        loop.run_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        loop.close()
 
 
 def run_docker_container():
