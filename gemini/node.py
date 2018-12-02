@@ -51,8 +51,8 @@ def start_node() -> None:
         print('Found node data.')
 
         node_data = read_node_file()
-        authenticate(node_data.node_id, node_data.password)
-        ping_loop()
+        if authenticate(node_data.node_id, node_data.password) is True:
+            ping_loop()
     else:
         print('Node data not found.')
 
@@ -60,8 +60,8 @@ def start_node() -> None:
         if new_node_data is None:
             pass
         else:
-            authenticate(new_node_data.node_id, new_node_data.password)
-            ping_loop()
+            if authenticate(node_data.node_id, node_data.password) is True:
+                ping_loop()
 
 
 async def ping() -> None:
