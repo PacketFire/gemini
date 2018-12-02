@@ -3,6 +3,7 @@ import json
 from typing import NamedTuple
 from typing import Optional
 
+import docker
 import requests
 
 
@@ -50,15 +51,19 @@ def start_node() -> None:
         print('Found node data.')
 
         node_data = read_node_file()
-        authenticate(node_data.node_id, node_data.password)
+        if authenticate(node_data.node_id, node_data.password) is True:
+            run_docker_container()
+            ping_loop()
     else:
         print('Node data not found.')
 
-        new_node_data = join()
-        if new_node_data is None:
+        new_data = join()
+        if new_data is None:
             pass
         else:
-            authenticate(new_node_data.node_id, new_node_data.password)
+            if authenticate(new_data.node_id, new_data.password,) is True:
+                run_docker_container()
+                ping_loop()
 
 
 async def ping() -> None:
@@ -107,20 +112,25 @@ def authenticate(node_id, password) -> bool:
 
     try:
         body = response.json()
-
         print('Successfully authenticated with master: ' + body['token'])
-
-        loop = asyncio.get_event_loop()
-        try:
-            asyncio.ensure_future(ping())
-            loop.run_forever()
-        except KeyboardInterrupt:
-            pass
-        finally:
-            loop.close()
-
         return True
     except ValueError:
         print('Invalid node credentials.')
 
         return False
+
+
+def ping_loop():
+    loop = asyncio.get_event_loop()
+    try:
+        asyncio.ensure_future(ping())
+        loop.run_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        loop.close()
+
+
+def run_docker_container():
+    client = docker.from_env()
+    client.containers.run("busybox", "echo hello world")
