@@ -4,13 +4,12 @@ from typing import Any
 from typing import List
 from typing import NamedTuple
 from typing import Optional
-from typing import Type
 
 import docker
 import requests
 
 
-jobs = Type[List[Any]]  # type: Type[List[Any]]
+jobs: List[Any]
 
 
 class NodeData(NamedTuple):
