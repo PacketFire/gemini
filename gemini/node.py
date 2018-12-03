@@ -118,17 +118,6 @@ def authenticate(node_id, password) -> bool:
         return False
 
 
-def ping_loop():
-    loop = asyncio.get_event_loop()
-    try:
-        asyncio.ensure_future(ping())
-        loop.run_forever()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        loop.close()
-
-
 def run_docker_container(image, command):
     client = docker.from_env()
     client.containers.run(image, command)
@@ -152,6 +141,23 @@ def run_jobs(jobs):
 
 def check_and_run(node_id, password):
     if authenticate(node_id, password) is True:
+        create_loops()
+
+
+async def poll_jobs():
+    while True:
+        await asyncio.sleep(10)
         jobs = get_jobs()  # type: List[Any]
         run_jobs(jobs)
-        ping_loop()
+
+
+def create_loops():
+    loop = asyncio.get_event_loop()
+    try:
+        asyncio.ensure_future(poll_jobs())
+        asyncio.ensure_future(ping())
+        loop.run_forever()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        loop.close()
