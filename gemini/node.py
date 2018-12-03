@@ -53,7 +53,7 @@ def start_node() -> None:
         print('Found node data.')
 
         node_data = read_node_file()
-        check_auth(node_data.node_id, node_data.password)
+        check_and_run(node_data.node_id, node_data.password)
     else:
         print('Node data not found.')
 
@@ -61,7 +61,7 @@ def start_node() -> None:
         if new_data is None:
             pass
         else:
-            check_auth(new_data.node_id, new_data.password)
+            check_and_run(new_data.node_id, new_data.password)
 
 
 async def ping() -> None:
@@ -150,7 +150,7 @@ def run_jobs(jobs):
         run_docker_container(jobs[i]['image'], jobs[i]['command'])
 
 
-def check_auth(node_id, password):
+def check_and_run(node_id, password):
     if authenticate(node_id, password) is True:
         jobs = get_jobs()  # type: List[Any]
         run_jobs(jobs)
