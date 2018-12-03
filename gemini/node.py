@@ -1,5 +1,7 @@
 import asyncio
 import json
+from typing import Any
+from typing import List
 from typing import NamedTuple
 from typing import Optional
 
@@ -51,9 +53,7 @@ def start_node() -> None:
         print('Found node data.')
 
         node_data = read_node_file()
-        if authenticate(node_data.node_id, node_data.password) is True:
-            run_docker_container()
-            ping_loop()
+        check_and_run(node_data.node_id, node_data.password)
     else:
         print('Node data not found.')
 
@@ -61,9 +61,7 @@ def start_node() -> None:
         if new_data is None:
             pass
         else:
-            if authenticate(new_data.node_id, new_data.password,) is True:
-                run_docker_container()
-                ping_loop()
+            check_and_run(new_data.node_id, new_data.password)
 
 
 async def ping() -> None:
@@ -131,6 +129,29 @@ def ping_loop():
         loop.close()
 
 
-def run_docker_container():
+def run_docker_container(image, command):
     client = docker.from_env()
-    client.containers.run("busybox", "echo hello world")
+    client.containers.run(image, command)
+
+
+def get_jobs() -> List[Any]:
+    url = 'http://localhost:5000/v1/jobs'
+    headers = {'Content-Type': 'application/json'}
+
+    response = requests.get(url, headers=headers)
+    jobs = response.json()
+
+    return jobs
+
+
+def run_jobs(jobs):
+    for i in range(len(jobs)):
+        print('Running: %s and %s' % (jobs[i]['image'], jobs[i]['command']))
+        run_docker_container(jobs[i]['image'], jobs[i]['command'])
+
+
+def check_and_run(node_id, password):
+    if authenticate(node_id, password) is True:
+        jobs = get_jobs()  # type: List[Any]
+        run_jobs(jobs)
+        ping_loop()
