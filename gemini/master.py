@@ -1,4 +1,4 @@
-# import json
+import json
 import secrets
 from typing import Any
 from typing import List
@@ -14,6 +14,8 @@ from flask import request
 NODE_ID_BYTES = 8
 NODE_TOKEN_BYTES = 32
 NODE_PASSWORD_BYTES = 32
+
+STORAGE_TYPE = "memory"
 
 app = Flask('gemini-master')
 
@@ -33,7 +35,28 @@ class MemoryNodeInfoRepository:
         return self.node_data[node_id]
 
 
-ds = MemoryNodeInfoRepository()
+class ConsulNodeInfoRepository:
+    def __init__(self):
+        self.node_data = {}
+
+    def put_data(self, value: dict):
+        c.kv.put('nodes/' + value['node_id'], json.dumps(value))
+
+    def get_data(self, node_id: str) -> dict:
+        self.node_data = c.kv.get('nodes/' + node_id)
+
+        if all(self.node_data):
+            output = json.loads(self.node_data[1]['Value'])
+
+        return output
+
+
+ds: Any
+
+if STORAGE_TYPE == "memory":
+    ds = MemoryNodeInfoRepository()
+else:
+    ds = ConsulNodeInfoRepository()
 
 
 @app.route('/')
@@ -61,7 +84,6 @@ def join() -> str:
         'password': hashed.decode('utf8'),
     }
     ds.put_data(value)
-#   c.kv.put('nodes/' + node_id, json.dumps(value))
 
     response = {
         'node_id': node_id,
@@ -74,14 +96,7 @@ def join() -> str:
 @app.route('/v1/nodes/auth', methods=['POST'])
 def auth() -> str:
     body = request.get_json()
-#   node_entry = c.kv.get('nodes/' + body['node_id'])
     node_data = ds.get_data(body['node_id'])
-#    print(node_entry)
-
-#    if all(node_entry):
-#        node_data = json.loads(node_entry[1]['Value'])
-#    else:
-#        return "Value does not exist\n"
 
     if bcrypt.checkpw(
         body['password'].encode('utf8'),
