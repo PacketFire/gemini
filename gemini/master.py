@@ -1,5 +1,7 @@
-import json
+# import json
 import secrets
+from typing import Any
+from typing import List
 
 import bcrypt
 import consul
@@ -17,7 +19,21 @@ app = Flask('gemini-master')
 
 c = consul.Consul(host='127.0.0.1', port=8500)
 
-jobs = []
+jobs: List[Any] = []
+
+
+class MemoryNodeInfoRepository:
+    def __init__(self):
+        self.node_data = {}
+
+    def put_data(self, value: dict):
+        self.node_data[value['node_id']] = value
+
+    def get_data(self, node_id: str) -> dict:
+        return self.node_data[node_id]
+
+
+ds = MemoryNodeInfoRepository()
 
 
 @app.route('/')
@@ -44,8 +60,8 @@ def join() -> str:
         'node_id': node_id,
         'password': hashed.decode('utf8'),
     }
-
-    c.kv.put('nodes/' + node_id, json.dumps(value))
+    ds.put_data(value)
+#   c.kv.put('nodes/' + node_id, json.dumps(value))
 
     response = {
         'node_id': node_id,
@@ -58,12 +74,14 @@ def join() -> str:
 @app.route('/v1/nodes/auth', methods=['POST'])
 def auth() -> str:
     body = request.get_json()
-    node_entry = c.kv.get('nodes/' + body['node_id'])
+#   node_entry = c.kv.get('nodes/' + body['node_id'])
+    node_data = ds.get_data(body['node_id'])
+#    print(node_entry)
 
-    if all(node_entry):
-        node_data = json.loads(node_entry[1]['Value'])
-    else:
-        return "Value does not exist\n"
+#    if all(node_entry):
+#        node_data = json.loads(node_entry[1]['Value'])
+#    else:
+#        return "Value does not exist\n"
 
     if bcrypt.checkpw(
         body['password'].encode('utf8'),
