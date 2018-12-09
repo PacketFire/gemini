@@ -1,9 +1,10 @@
-import json
 import secrets
+from typing import Any
+from typing import List
 
 import bcrypt
-import consul
 import metadata
+import storage
 from flask import Flask
 from flask import jsonify
 from flask import request
@@ -12,12 +13,14 @@ from flask import request
 NODE_ID_BYTES = 8
 NODE_TOKEN_BYTES = 32
 NODE_PASSWORD_BYTES = 32
+NODE_STORAGE = 0
+
 
 app = Flask('gemini-master')
 
-c = consul.Consul(host='127.0.0.1', port=8500)
+jobs: List[Any] = []
 
-jobs = []
+ds = storage.determine_store(NODE_STORAGE)
 
 
 @app.route('/')
@@ -44,8 +47,7 @@ def join() -> str:
         'node_id': node_id,
         'password': hashed.decode('utf8'),
     }
-
-    c.kv.put('nodes/' + node_id, json.dumps(value))
+    ds.put_data(value)
 
     response = {
         'node_id': node_id,
@@ -58,12 +60,7 @@ def join() -> str:
 @app.route('/v1/nodes/auth', methods=['POST'])
 def auth() -> str:
     body = request.get_json()
-    node_entry = c.kv.get('nodes/' + body['node_id'])
-
-    if all(node_entry):
-        node_data = json.loads(node_entry[1]['Value'])
-    else:
-        return "Value does not exist\n"
+    node_data = ds.get_data(body['node_id'])
 
     if bcrypt.checkpw(
         body['password'].encode('utf8'),
