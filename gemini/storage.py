@@ -2,10 +2,13 @@ import consul
 from abc import ABC
 from abc import abstractmethod
 from typing import Any
+from mypy_extensions import TypedDict
 import json
 import functools
 
 c = consul.Consul(host='127.0.0.1', port=8500)
+
+node = TypedDict('node', {'node_id': str, 'password': str})
 
 
 class NodeInfoRepository(ABC):
@@ -18,7 +21,7 @@ class NodeInfoRepository(ABC):
         pass
 
     @abstractmethod
-    def get_data(self, node_id: str) -> dict:
+    def get_data(self, node_id: str) -> node:
         pass
 
 
@@ -29,7 +32,7 @@ class MemoryNodeInfoRepository(NodeInfoRepository):
     def put_data(self, value: dict):
         self.node_data[value['node_id']] = value
 
-    def get_data(self, node_id: str) -> dict:
+    def get_data(self, node_id: str) -> node:
         return self.node_data[node_id]
 
 
@@ -40,7 +43,7 @@ class ConsulNodeInfoRepository(NodeInfoRepository):
     def put_data(self, value: dict):
         c.kv.put('nodes/' + value['node_id'], json.dumps(value))
 
-    def get_data(self, node_id: str) -> dict:
+    def get_data(self, node_id: str) -> node:
         self.node_data = c.kv.get('nodes/' + node_id)
 
         if all(self.node_data):
