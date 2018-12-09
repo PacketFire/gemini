@@ -1,11 +1,10 @@
-import json
 import secrets
 from typing import Any
 from typing import List
 
 import bcrypt
-import consul
 import metadata
+import storage
 from flask import Flask
 from flask import jsonify
 from flask import request
@@ -15,48 +14,12 @@ NODE_ID_BYTES = 8
 NODE_TOKEN_BYTES = 32
 NODE_PASSWORD_BYTES = 32
 
-STORAGE_TYPE = "memory"
 
 app = Flask('gemini-master')
 
-c = consul.Consul(host='127.0.0.1', port=8500)
-
 jobs: List[Any] = []
 
-
-class MemoryNodeInfoRepository:
-    def __init__(self):
-        self.node_data = {}
-
-    def put_data(self, value: dict):
-        self.node_data[value['node_id']] = value
-
-    def get_data(self, node_id: str) -> dict:
-        return self.node_data[node_id]
-
-
-class ConsulNodeInfoRepository:
-    def __init__(self):
-        self.node_data = {}
-
-    def put_data(self, value: dict):
-        c.kv.put('nodes/' + value['node_id'], json.dumps(value))
-
-    def get_data(self, node_id: str) -> dict:
-        self.node_data = c.kv.get('nodes/' + node_id)
-
-        if all(self.node_data):
-            output = json.loads(self.node_data[1]['Value'])
-
-        return output
-
-
-ds: Any
-
-if STORAGE_TYPE == "memory":
-    ds = MemoryNodeInfoRepository()
-else:
-    ds = ConsulNodeInfoRepository()
+ds = storage.determine_store(0)
 
 
 @app.route('/')
