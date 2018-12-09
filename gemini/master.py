@@ -13,13 +13,14 @@ from flask import request
 NODE_ID_BYTES = 8
 NODE_TOKEN_BYTES = 32
 NODE_PASSWORD_BYTES = 32
+NODE_STORAGE = 0
 
 
 app = Flask('gemini-master')
 
 jobs: List[Any] = []
 
-ds = storage.determine_store(0)
+ds = storage.determine_store(NODE_STORAGE)
 
 
 @app.route('/')
