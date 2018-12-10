@@ -6,7 +6,12 @@ from typing import NamedTuple
 from typing import Optional
 
 import docker
+import logger
 import requests
+
+
+logger.read_config()
+log = logger.logging.getLogger(__name__)
 
 
 class NodeData(NamedTuple):
@@ -48,14 +53,14 @@ def node_file_exists() -> bool:
 
 
 def start_node() -> None:
-    print('Checking if node data exists...')
+    log.info('Checking if node data exists...')
     if node_file_exists():
-        print('Found node data.')
+        log.info('Found node data.')
 
         node_data = read_node_file()
         check_and_run(node_data.node_id, node_data.password)
     else:
-        print('Node data not found.')
+        log.info('Node data not found.')
 
         new_data = join()
         if new_data is None:
@@ -74,7 +79,7 @@ async def ping() -> None:
 
 
 def join() -> Optional[NodeData]:
-    print('Joining master.')
+    log.info('Joining master.')
 
     url = 'http://localhost:5000/v1/nodes/join'
     headers = {'Content-Type': 'application/json'}
@@ -84,19 +89,19 @@ def join() -> Optional[NodeData]:
         body = response.json()
         node_data = NodeData(body['node_id'], body['password'])
 
-        print('Joined master. Assigned node ID ' + node_data.node_id)
+        log.info('Joined master. Assigned node ID ' + node_data.node_id)
 
         write_node_file(node_data)
 
         return node_data
     except ValueError:
-        print('Failed to join master.')
+        log.info('Failed to join master.')
 
         return None
 
 
 def authenticate(node_id, password) -> bool:
-    print('Authenticating with master.')
+    log.info('Authenticating with master.')
 
     url = 'http://localhost:5000/v1/nodes/auth'
     headers = {'Content-Type': 'application/json'}
@@ -110,10 +115,10 @@ def authenticate(node_id, password) -> bool:
 
     try:
         body = response.json()
-        print('Successfully authenticated with master: ' + body['token'])
+        log.info('Successfully authenticated with master: ' + body['token'])
         return True
     except ValueError:
-        print('Invalid node credentials.')
+        log.info('Invalid node credentials.')
 
         return False
 
@@ -135,7 +140,7 @@ def get_jobs() -> List[Any]:
 
 def run_jobs(jobs):
     for i in range(len(jobs)):
-        print('Running: %s and %s' % (jobs[i]['image'], jobs[i]['command']))
+        log.info('Running: %s and %s' % (jobs[i]['image'], jobs[i]['command']))
         run_docker_container(jobs[i]['image'], jobs[i]['command'])
 
 
