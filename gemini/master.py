@@ -78,9 +78,11 @@ def auth() -> str:
 @app.route('/v1/jobs', methods=['POST'])
 def create_job() -> str:
     body = request.get_json()
+    node_id = random_node_id()
 
     global jobs
     jobs.append({
+        'node_id': node_id,
         'image': body['image'],
         'command': body['command'],
     })
@@ -112,6 +114,15 @@ def refresh() -> str:
 
     return jsonify(response)
 
+
+def random_node_id() -> str:
+    node_data = ds.get_all_data() 
+
+    for k, v in node_data.items():
+        if isinstance(v, dict):
+            return k
+
+    return ""
 
 def generate_node_id() -> str:
     return secrets.token_hex(NODE_ID_BYTES)

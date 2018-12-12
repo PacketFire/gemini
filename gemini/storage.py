@@ -24,6 +24,10 @@ class NodeInfoRepository(ABC):
     def get_data(self, node_id: str) -> node:
         pass
 
+    @abstractmethod
+    def get_all_data(self) -> dict:
+        pass
+
 
 class MemoryNodeInfoRepository(NodeInfoRepository):
     def __init__(self):
@@ -34,6 +38,9 @@ class MemoryNodeInfoRepository(NodeInfoRepository):
 
     def get_data(self, node_id: str) -> node:
         return self.node_data[node_id]
+
+    def get_all_data(self) -> dict:
+        return self.node_data
 
 
 class ConsulNodeInfoRepository(NodeInfoRepository):
@@ -48,6 +55,15 @@ class ConsulNodeInfoRepository(NodeInfoRepository):
 
         if all(self.node_data):
             output = json.loads(self.node_data[1]['Value'])
+
+        return output
+
+
+    def get_all_data(self) -> dict:
+        self.node_data = c.kv.get('nodes/')
+
+        if all (self.node_data):
+            output = json.loads(self.node_data)
 
         return output
 
