@@ -1,3 +1,4 @@
+import random
 import secrets
 from typing import Any
 from typing import List
@@ -47,7 +48,7 @@ def join() -> str:
         'node_id': node_id,
         'password': hashed.decode('utf8'),
     }
-    ds.put_data(value)
+    ds.put_node(value)
 
     response = {
         'node_id': node_id,
@@ -60,7 +61,7 @@ def join() -> str:
 @app.route('/v1/nodes/auth', methods=['POST'])
 def auth() -> str:
     body = request.get_json()
-    node_data = ds.get_data(body['node_id'])
+    node_data = ds.get_node(body['node_id'])
 
     if bcrypt.checkpw(
         body['password'].encode('utf8'),
@@ -78,9 +79,11 @@ def auth() -> str:
 @app.route('/v1/jobs', methods=['POST'])
 def create_job() -> str:
     body = request.get_json()
+    node_id = random_node_id()
 
     global jobs
     jobs.append({
+        'node_id': node_id,
         'image': body['image'],
         'command': body['command'],
     })
@@ -111,6 +114,13 @@ def refresh() -> str:
     }
 
     return jsonify(response)
+
+
+def random_node_id() -> str:
+    node_data = ds.get_all_nodes()
+    key = random.choice(list(node_data.keys()))
+
+    return key
 
 
 def generate_node_id() -> str:

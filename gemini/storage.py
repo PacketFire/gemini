@@ -17,11 +17,15 @@ class NodeInfoRepository(ABC):
         super().__init__()
 
     @abstractmethod
-    def put_data(self, value: dict):
+    def put_node(self, value: dict):
         pass
 
     @abstractmethod
-    def get_data(self, node_id: str) -> node:
+    def get_node(self, node_id: str) -> node:
+        pass
+
+    @abstractmethod
+    def get_all_nodes(self) -> dict:
         pass
 
 
@@ -29,25 +33,37 @@ class MemoryNodeInfoRepository(NodeInfoRepository):
     def __init__(self):
         self.node_data = {}
 
-    def put_data(self, value: dict):
+    def put_node(self, value: dict):
         self.node_data[value['node_id']] = value
 
-    def get_data(self, node_id: str) -> node:
+    def get_node(self, node_id: str) -> node:
         return self.node_data[node_id]
+
+    def get_all_nodes(self) -> dict:
+        return self.node_data
 
 
 class ConsulNodeInfoRepository(NodeInfoRepository):
     def __init__(self):
         self.node_data = {}
 
-    def put_data(self, value: dict):
+    def put_node(self, value: dict):
         c.kv.put('nodes/' + value['node_id'], json.dumps(value))
 
-    def get_data(self, node_id: str) -> node:
+    def get_node(self, node_id: str) -> node:
         self.node_data = c.kv.get('nodes/' + node_id)
 
         if all(self.node_data):
             output = json.loads(self.node_data[1]['Value'])
+
+        return output
+
+
+    def get_all_nodes(self) -> dict:
+        self.node_data = c.kv.get('nodes/')
+
+        if all (self.node_data):
+            output = json.loads(self.node_data)
 
         return output
 

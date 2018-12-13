@@ -140,8 +140,9 @@ def get_jobs() -> List[Any]:
 
 def run_jobs(jobs):
     for i in range(len(jobs)):
-        log.info('Running: %s and %s' % (jobs[i]['image'], jobs[i]['command']))
-        run_docker_container(jobs[i]['image'], jobs[i]['command'])
+        if NodeData.node_id in jobs[i]:
+            log.info('Running: %s and %s' % (jobs[i]['image'], jobs[i]['command']))
+            run_docker_container(jobs[i]['image'], jobs[i]['command'])
 
 
 def check_and_run(node_id, password):
