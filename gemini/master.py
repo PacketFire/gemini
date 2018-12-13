@@ -5,6 +5,7 @@ from typing import List
 import bcrypt
 import metadata
 import storage
+import random
 from flask import Flask
 from flask import jsonify
 from flask import request
@@ -116,13 +117,11 @@ def refresh() -> str:
 
 
 def random_node_id() -> str:
-    node_data = ds.get_all_data() 
+    node_data = ds.get_all_data()
+    key = random.choice(list(node_data.keys()))
 
-    for k, v in node_data.items():
-        if isinstance(v, dict):
-            return k
+    return key
 
-    return ""
 
 def generate_node_id() -> str:
     return secrets.token_hex(NODE_ID_BYTES)
