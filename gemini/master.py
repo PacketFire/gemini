@@ -1,3 +1,4 @@
+import random
 import secrets
 from typing import Any
 from typing import List
@@ -5,7 +6,6 @@ from typing import List
 import bcrypt
 import metadata
 import storage
-import random
 from flask import Flask
 from flask import jsonify
 from flask import request
@@ -48,7 +48,7 @@ def join() -> str:
         'node_id': node_id,
         'password': hashed.decode('utf8'),
     }
-    ds.put_data(value)
+    ds.put_node(value)
 
     response = {
         'node_id': node_id,
@@ -61,7 +61,7 @@ def join() -> str:
 @app.route('/v1/nodes/auth', methods=['POST'])
 def auth() -> str:
     body = request.get_json()
-    node_data = ds.get_data(body['node_id'])
+    node_data = ds.get_node(body['node_id'])
 
     if bcrypt.checkpw(
         body['password'].encode('utf8'),
@@ -117,7 +117,7 @@ def refresh() -> str:
 
 
 def random_node_id() -> str:
-    node_data = ds.get_all_data()
+    node_data = ds.get_all_nodes()
     key = random.choice(list(node_data.keys()))
 
     return key
