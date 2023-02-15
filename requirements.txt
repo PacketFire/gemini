@@ -4,38 +4,92 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
-aspy.yaml==1.1.1          # via pre-commit
+aspy-yaml==1.1.1
+    # via pre-commit
 bcrypt==3.1.4
-cached-property==1.5.1    # via pre-commit
-certifi==2018.10.15       # via requests
-cffi==1.11.5              # via bcrypt
-cfgv==1.1.0               # via pre-commit
-chardet==3.0.4            # via requests
+    # via -r requirements.in
+cached-property==1.5.1
+    # via pre-commit
+certifi==2018.10.15
+    # via requests
+cffi==1.11.5
+    # via bcrypt
+cfgv==1.1.0
+    # via pre-commit
+chardet==3.0.4
+    # via requests
 click==7.0
-docker-pycreds==0.3.0     # via docker
+    # via
+    #   -r requirements.in
+    #   flask
+    #   pip-tools
 docker==3.5.1
-first==2.0.1              # via pip-tools
+    # via -r requirements.in
+docker-pycreds==0.3.0
+    # via docker
+first==2.0.1
+    # via pip-tools
 flask==1.0.2
-identify==1.1.7           # via pre-commit
-idna==2.7                 # via requests
-importlib-metadata==0.6   # via pre-commit
-importlib-resources==1.0.2  # via pre-commit
-itsdangerous==1.1.0       # via flask
-jinja2==2.10              # via flask
-markupsafe==1.0           # via jinja2
-mypy-extensions==0.4.1
+    # via -r requirements.in
+identify==1.1.7
+    # via pre-commit
+idna==2.7
+    # via requests
+importlib-metadata==0.6
+    # via pre-commit
+itsdangerous==1.1.0
+    # via flask
+jinja2==2.10
+    # via flask
+markupsafe==2.1.2
+    # via
+    #   jinja2
+    #   werkzeug
 mypy==0.630
-nodeenv==1.3.2            # via pre-commit
+    # via -r requirements.in
+mypy-extensions==0.4.1
+    # via
+    #   -r requirements.in
+    #   mypy
+nodeenv==1.3.2
+    # via pre-commit
 pip-tools==2.0.2
-pre_commit==1.12.0
-pycparser==2.19           # via cffi
+    # via -r requirements.in
+pre-commit==1.12.0
+    # via -r requirements.in
+pycparser==2.19
+    # via cffi
 python-consul==1.1.0
+    # via -r requirements.in
 pyyaml==3.13
+    # via
+    #   -r requirements.in
+    #   aspy-yaml
+    #   pre-commit
 requests==2.20.0
-six==1.11.0               # via bcrypt, cfgv, docker, docker-pycreds, pip-tools, pre-commit, python-consul, websocket-client
-toml==0.10.0              # via pre-commit
-typed-ast==1.1.0          # via mypy
-urllib3==1.24             # via requests
-virtualenv==16.1.0        # via pre-commit
-websocket-client==0.54.0  # via docker
-werkzeug==0.14.1          # via flask
+    # via
+    #   -r requirements.in
+    #   docker
+    #   python-consul
+six==1.11.0
+    # via
+    #   bcrypt
+    #   cfgv
+    #   docker
+    #   docker-pycreds
+    #   pip-tools
+    #   pre-commit
+    #   python-consul
+    #   websocket-client
+toml==0.10.0
+    # via pre-commit
+typed-ast==1.1.0
+    # via mypy
+urllib3==1.24
+    # via requests
+virtualenv==16.1.0
+    # via pre-commit
+websocket-client==0.54.0
+    # via docker
+werkzeug==2.2.3
+    # via flask
